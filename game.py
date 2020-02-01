@@ -2,9 +2,11 @@ from time import sleep
 
 import pyxel
 import signals
+from target import Target
 
 
 INPUT_PREAMBLE = 'from signals import *\n'
+
 
 class Game():
 
@@ -23,11 +25,20 @@ class Game():
         self.player_y = 120
         self.player_y_delta = 0
 
+        self.targets = {
+            'A': Target(200, 100),
+            'B': Target(1, 1),
+            'C': Target(120, 220)
+        }
+
         self.locked = False
 
         pyxel.run(self.update, self.draw)
 
     def update(self):
+        if pyxel.btnp(pyxel.KEY_ESCAPE):
+            pyxel.quit()
+
         if not self.locked and pyxel.btnr(pyxel.KEY_SPACE):
             script = INPUT_PREAMBLE + self.read_input()
             self.reset_vars()
@@ -57,13 +68,15 @@ class Game():
     def draw(self):
         pyxel.cls(12)
         if not self.locked:
-            pyxel.text(0, 235, '[SPACE] run INPUT', 10)
+            pyxel.text(0, 234, '[SPACE] run INPUT', 1)
+
+        [self.draw_target(k, t) for k, t in self.targets.items()]
 
         # player
-        pyxel.blt(self.player_x, self.player_y,
-                0, 0, 0,
-                16, 16,
-                0)
+        pyxel.blt(self.player_x, self.player_y, 0,
+                  0, 0,
+                  16, 16,
+                  0)
 
         # see() text
         pyxel.text(0, 0, self.seemsg_out, 7)
@@ -106,5 +119,13 @@ class Game():
             self.seemsg_out += next(self.seemsg_iter)
         else:
             self.locked = False
+
+    def draw_target(self, name: str, tgt: Target):
+        pyxel.blt(tgt.x, tgt.y, 0,
+                  32, 0,
+                  16, 16,
+                  0)
+        pyxel.text(tgt.x, tgt.y+11, name, 0)
+
 
 Game()
