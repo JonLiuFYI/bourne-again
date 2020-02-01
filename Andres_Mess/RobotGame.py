@@ -24,7 +24,7 @@ class RobotGame:
         self.waitTime =0.2
         self.currentWaitTime = 0
         self.isWaiting = False
-        
+
         self.info_text = ""
         pyxel.run(self.update, self.draw)
 
@@ -52,7 +52,7 @@ class RobotGame:
 
         self.check_win_collision()
 
-        if pyxel.btnp(pyxel.KEY_Y):    
+        if pyxel.btnp(pyxel.KEY_Y):
             self.get_target_location()
 
             print( math.degrees(math.atan2(self.target_y - self.player_y, self.target_x - self.player_x)))
@@ -60,30 +60,30 @@ class RobotGame:
 
     def move_robot_right(self, moveX):
         print("move right")
-        for i in range(moveX):
+        for _ in range(moveX):
             self.player_x += 1
             #time.sleep(0.2)
 
     def move_robot_left(self, moveX):
         print("move left")
-        for i in range(moveX):
+        for _ in range(moveX):
             self.player_x += -1
             #time.sleep(0.2)
-    
+
     def move_robot_up(self, moveY):
         print("move up")
-        for i in range(moveY):
+        for _ in range(moveY):
             self.player_y += -1
             #time.sleep(0.2)
 
     def move_robot_down(self, moveY):
         print("move down")
-        for i in range(moveY):
+        for _ in range(moveY):
             self.player_y += 1
             #time.sleep(0.2)
 
 
-    
+
     #set info text
     def setInfoText(self, message):
         self.info_text = message
@@ -187,7 +187,7 @@ class RobotGame:
             16,
             0,
             )
-        
+
 
         self.writeToScreen()
 
