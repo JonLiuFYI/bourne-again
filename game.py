@@ -1,4 +1,4 @@
-from time import sleep
+from math import sin, cos, radians
 
 import pyxel
 import signals
@@ -24,6 +24,9 @@ class Game():
         self.player_x_delta = 0
         self.player_y = 120
         self.player_y_delta = 0
+
+        self.beam_angle = None
+        self.beam_start_time = 0
 
         self.targets = {
             'A': Target(200, 100, 'Target A feels lonely'),
@@ -53,7 +56,8 @@ class Game():
                 """Start typing out info on the named target."""
                 if see.msg in self.targets:
                     tgt: Target = self.targets[see.msg]
-                    self.set_msg(f'{see.msg} ({tgt.x}, {tgt.y})\n{tgt.comment}')
+                    self.set_msg(
+                        f'{see.msg} ({tgt.x}, {tgt.y})\n{tgt.comment}')
                 else:
                     self.set_msg(f'{see.msg}: no such target')
 
@@ -69,11 +73,16 @@ class Game():
             except signals.Down as down:
                 self.player_y_delta = down.dist
 
+            except signals.Shoot as shot:
+                self.beam_angle = radians(-shot.angle)
+                self.beam_start_time = pyxel.frame_count
+
             except:
                 pass
 
         if self.player_x_delta != 0 or self.player_y_delta != 0:
             self.move_player()
+
         if len(self.seemsg) > 0:
             self.typeout()
 
@@ -89,6 +98,9 @@ class Game():
                   0, 0,
                   16, 16,
                   0)
+
+        if self.beam_angle is not None:
+            self.draw_beam(self.beam_angle, self.beam_start_time)
 
         # see() text
         pyxel.text(1, 1, self.seemsg_out, 0)
@@ -142,6 +154,32 @@ class Game():
                   16, 16,
                   0)
         pyxel.text(tgt.x, tgt.y+11, name, 0)
+
+    def draw_beam(self, angle: float, starttime: int):
+        elapsed_frames = pyxel.frame_count - starttime
+
+        color = 10
+        if 3 <= elapsed_frames < 6:
+            color = 11
+        elif 6 <= elapsed_frames < 9:
+            color = 3
+        elif 9 <= elapsed_frames < 12:
+            color = 1
+        elif elapsed_frames >= 12:
+            self.beam_angle = None
+            self.locked = False
+            return
+
+        eye1 = (self.player_x + 5, self.player_y + 4)
+        eye2 = (self.player_x + 10, self.player_y + 4)
+        pyxel.line(eye1[0], eye1[1],
+                   eye1[0] + 1000*cos(self.beam_angle),
+                   eye1[1] + 1000*sin(self.beam_angle),
+                   color)
+        pyxel.line(eye2[0], eye2[1],
+                   eye2[0] + 1000*cos(self.beam_angle),
+                   eye2[1] + 1000*sin(self.beam_angle),
+                   color)
 
 
 Game()

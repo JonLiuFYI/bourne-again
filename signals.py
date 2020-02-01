@@ -14,12 +14,12 @@ class Help(Exception):
 
 
 class See(Exception):
-    def __init__(self, msg):
+    def __init__(self, msg: str):
         self.msg = msg
 
 
 class Move(Exception):
-    def __init__(self, dist):
+    def __init__(self, dist: int):
         self.dist = dist
 
 
@@ -38,6 +38,11 @@ class Up(Move):
 class Down(Move):
     pass
 
+
+class Shoot(Exception):
+    def __init__(self, angle: float):
+        self.angle = angle
+
 ###############################
 
 
@@ -46,23 +51,27 @@ def help():
     raise Help
 
 
-def see(msg):
+def see(msg: str):
     """Display location of a target"""
     raise See(msg)
 
 
-def right(dist):
+def right(dist: int):
     """Move right by the specified number of pixels."""
     raise Right(dist)
 
 
-def left(dist):
+def left(dist: int):
     raise Left(dist)
 
 
-def up(dist):
+def up(dist: int):
     raise Up(dist)
 
 
-def down(dist):
+def down(dist: int):
     raise Down(dist)
+
+
+def shoot(angle: float):
+    raise Shoot(angle)
