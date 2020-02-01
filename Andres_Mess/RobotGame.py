@@ -114,7 +114,7 @@ class RobotGame:
     #SHOW LOCATION OF TARGET
     def get_target_location(self):
         print("Get target location")
-        self.setInfoText("("+str(self.target_x)+", "+str(self.target_y)+")")
+        self.setInfoText(f"({self.target_x}, {self.target_y})")
         #self.writeToScreen()
 
     #SHOOT
