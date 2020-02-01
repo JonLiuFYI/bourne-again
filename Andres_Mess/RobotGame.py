@@ -106,7 +106,7 @@ class RobotGame:
             self.target_y += moveY
 
     # MOVE BLL
-    def update_target(self, moveX, moveY):
+    def update_ball(self, moveX, moveY):
             self.ball_x += moveX
             self.ball_y += moveY
 
