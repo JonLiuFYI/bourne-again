@@ -1,5 +1,6 @@
 import pyxel
 import time
+import math
 
 class RobotGame:
     def __init__(self):
@@ -54,6 +55,7 @@ class RobotGame:
         if pyxel.btnp(pyxel.KEY_Y):    
             self.get_target_location()
 
+            print( math.degrees(math.atan2(self.target_y - self.player_y, self.target_x - self.player_x)))
 
 
     def move_robot_right(self, moveX):
@@ -100,7 +102,7 @@ class RobotGame:
 
     # MOVE TARGET
     def update_target(self, moveX, moveY):
-            self.target_x_x += moveX
+            self.target_x += moveX
             self.target_y += moveY
 
     # MOVE BLL
@@ -115,9 +117,9 @@ class RobotGame:
         self.setInfoText("("+str(self.target_x)+", "+str(self.target_y)+")")
         #self.writeToScreen()
 
-        #SHOOT
+    #SHOOT
     def shoot_at_target(self, angle):
-        if math.atan2(self.target.x - self.player.x, self.target_y - self.player_y) == angle:
+        if math.degrees(math.atan2(self.target_y - self.player_y, self.target_x - self.player_x)) < angle + 1 and  math.degrees(math.atan2(self.target_y - self.player_y, self.target_x - self.player_x)) > angle - 1:
             print("Corrcet!")
 
     #COLLISION BETWEEN PLAYER AND FLAG
@@ -174,7 +176,7 @@ class RobotGame:
             16,
             0,
             )
-         #draw target
+         #draw ball
         pyxel.blt(
             self.ball_x,
             self.ball_y,
