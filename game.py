@@ -3,7 +3,7 @@ from math import sin, cos, radians
 import pyxel
 import signals
 from target import Target
-
+from solid_sprite import Solid
 
 INPUT_PREAMBLE = 'from signals import *\n'
 
@@ -33,6 +33,12 @@ class Game():
             'B': Target(1, 20, 'Fortune awaits Target B'),
             'C': Target(120, 220, 'Target C is in the mood for shawarma')
         }
+
+        self.wall = [
+            Solid(30, 160),
+            Solid(100, 45),
+            Solid(24, 200)
+        ]
 
         self.locked = False
 
@@ -93,6 +99,8 @@ class Game():
 
         [self.draw_target(k, t) for k, t in self.targets.items()]
 
+        [self.draw_wall(w) for w in self.wall]
+
         # player
         pyxel.blt(self.player_x, self.player_y, 0,
                   0, 0,
@@ -121,18 +129,42 @@ class Game():
     def move_player(self):
         """Move the player step by step to the new position."""
         if self.player_x_delta > 0:
-            self.player_x += 1
-            self.player_x_delta -= 1
+            # if is there is no wall
+            if self.detect_wall_collision(1, 0) == False:
+                self.player_x += 1
+                self.player_x_delta -= 1
+            else:
+                self.player_x_delta = 0
+                self.player_y_delta = 0
+                self.locked = False
+
         elif self.player_x_delta < 0:
-            self.player_x -= 1
-            self.player_x_delta += 1
+            # if there is no wall
+            if self.detect_wall_collision(-1, 0) == False:
+                self.player_x -= 1
+                self.player_x_delta += 1
+            else:
+                self.player_x_delta = 0
+                self.player_y_delta = 0
+                self.locked = False
 
         if self.player_y_delta > 0:
-            self.player_y += 1
-            self.player_y_delta -= 1
+            if self.detect_wall_collision(0, 1) == False:
+                self.player_y += 1
+                self.player_y_delta -= 1
+            else:
+                self.player_x_delta = 0
+                self.player_y_delta = 0
+                self.locked = False
+        # if there is a wall
         elif self.player_y_delta < 0:
-            self.player_y -= 1
-            self.player_y_delta += 1
+            if self.detect_wall_collision(0, -1) == False:
+                self.player_y -= 1
+                self.player_y_delta += 1
+            else:
+                self.player_x_delta = 0
+                self.player_y_delta = 0
+                self.locked = False
 
         if self.player_x_delta == self.player_y_delta == 0:
             self.locked = False
@@ -180,6 +212,24 @@ class Game():
                    eye2[0] + 1000*cos(self.beam_angle),
                    eye2[1] + 1000*sin(self.beam_angle),
                    color)
+
+    def draw_wall(self, sld: Solid):
+        pyxel.blt(sld.x, sld.y, 0,
+                  0, 16,
+                  56, 56,
+                  0)
+
+    def detect_wall_collision(self, x_inc, y_inc):
+        for w in self.wall:
+            if (
+                self.player_x + x_inc + 14 >= w.x
+                and self.player_x + x_inc <= w.x + 14
+                and self.player_y + y_inc + 15 >= w.y
+                and self.player_y + y_inc <= w.y + 15
+            ):
+                return True
+            else:
+                return False
 
 
 Game()
