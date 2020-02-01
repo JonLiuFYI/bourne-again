@@ -55,14 +55,15 @@ class Game():
             self.typeout()
 
     def draw(self):
-        pyxel.cls(0)
+        pyxel.cls(12)
         if not self.locked:
             pyxel.text(0, 235, '[SPACE] run INPUT', 10)
 
         # player
         pyxel.blt(self.player_x, self.player_y,
                 0, 0, 0,
-                16, 16)
+                16, 16,
+                0)
 
         # see() text
         pyxel.text(0, 0, self.seemsg_out, 7)
