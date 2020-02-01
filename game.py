@@ -45,23 +45,30 @@ class Game():
             try:
                 self.locked = True
                 exec(script)
+
+            except signals.Help:
+                self.set_msg(signals.HELP)
+
             except signals.See as see:
                 """Start typing out info on the named target."""
                 if see.msg in self.targets:
                     tgt: Target = self.targets[see.msg]
-                    self.seemsg = f'{see.msg} ({tgt.x}, {tgt.y})\n{tgt.comment}'
+                    self.set_msg(f'{see.msg} ({tgt.x}, {tgt.y})\n{tgt.comment}')
                 else:
-                    self.seemsg = f'{see.msg}: no such target'
+                    self.set_msg(f'{see.msg}: no such target')
 
-                self.seemsg_iter = iter(self.seemsg)
             except signals.Right as right:
                 self.player_x_delta = right.dist
+
             except signals.Left as left:
                 self.player_x_delta = -left.dist
+
             except signals.Up as up:
                 self.player_y_delta = -up.dist
+
             except signals.Down as down:
                 self.player_y_delta = down.dist
+
             except:
                 pass
 
@@ -117,6 +124,10 @@ class Game():
 
         if self.player_x_delta == self.player_y_delta == 0:
             self.locked = False
+
+    def set_msg(self, msg: str):
+        self.seemsg = msg
+        self.seemsg_iter = iter(self.seemsg)
 
     def typeout(self):
         """Type out see() text one letter at a time."""
