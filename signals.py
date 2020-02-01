@@ -24,8 +24,7 @@ class Down(Move):
 
 
 def see(msg):
-    """Display msg as text on the game display.
-    LATER: print info about an object"""
+    """Display location of a target"""
     raise See(msg)
 
 

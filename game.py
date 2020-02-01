@@ -26,9 +26,9 @@ class Game():
         self.player_y_delta = 0
 
         self.targets = {
-            'A': Target(200, 100),
-            'B': Target(1, 1),
-            'C': Target(120, 220)
+            'A': Target(200, 100, 'Target A feels lonely'),
+            'B': Target(1, 20, 'Fortune awaits Target B'),
+            'C': Target(120, 220, 'Target C is in the mood for shawarma')
         }
 
         self.locked = False
@@ -46,8 +46,13 @@ class Game():
                 self.locked = True
                 exec(script)
             except signals.See as see:
-                """Start typing out the see text."""
-                self.seemsg = see.msg
+                """Start typing out info on the named target."""
+                if see.msg in self.targets:
+                    tgt: Target = self.targets[see.msg]
+                    self.seemsg = f'{see.msg} ({tgt.x}, {tgt.y})\n{tgt.comment}'
+                else:
+                    self.seemsg = f'{see.msg}: no such target'
+
                 self.seemsg_iter = iter(self.seemsg)
             except signals.Right as right:
                 self.player_x_delta = right.dist
@@ -79,7 +84,7 @@ class Game():
                   0)
 
         # see() text
-        pyxel.text(0, 0, self.seemsg_out, 7)
+        pyxel.text(1, 1, self.seemsg_out, 0)
 
     def read_input(self):
         """Get all the text from the INPUT file."""
