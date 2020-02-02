@@ -1,6 +1,6 @@
 HELP = """Enter commands to do stuff.
     help() - See this message
-    see(target_name) - See a target's info
+    see('target_name') - See a target's info
     right(distance)
     left(distance)
     up(distance)
