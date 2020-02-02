@@ -89,6 +89,7 @@ class Game():
             except signals.Shoot as shot:
                 self.beam_angle = radians(-shot.angle)
                 self.beam_start_time = pyxel.frame_count
+                pyxel.play(3, 0)
 
             except:
                 pass
@@ -205,6 +206,7 @@ class Game():
     def draw_beam(self, angle: float, starttime: int):
         """Draw a beam at the angle for both eyes."""
         elapsed_frames = pyxel.frame_count - starttime
+
 
         color = 10
         if 3 <= elapsed_frames < 6:
