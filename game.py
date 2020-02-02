@@ -283,7 +283,7 @@ class Game():
         # walls
         for w in self.walls:
             if (self.player.x + xdir + 14 >= w.x
-                    and self.player.x + xdir <= w.x
+                    and self.player.x + xdir <= w.x + 14
                     and self.player.y + ydir + 15 >= w.y
                     and self.player.y + ydir <= w.y + 15):
                 out = True
