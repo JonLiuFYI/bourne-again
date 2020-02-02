@@ -117,9 +117,9 @@ class Game():
         if self.beam_angle is not None:
             self.draw_beam(self.beam_angle, self.beam_start_time)
 
-        # draw flag
+        # flag
         pyxel.blt(self.flag.x, self.flag.y, 0,
-                  16, 0,
+                  *self.flag.step_anim(pyxel.frame_count),
                   16, 16,
                   0)
 
