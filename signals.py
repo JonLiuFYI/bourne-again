@@ -10,6 +10,15 @@ HELP = """Enter commands to do stuff.
     credits() - Who made this, anyway?
 """
 
+START_HELP = """Enter commands to do stuff.
+    help() - See this message
+    see('target_name') - See a target's info
+    right(distance) - Move that many pixels over
+    shoot(angle) - Shoot a beam at that angle
+
+    credits() - Who made this, anyway?
+"""
+
 CREDITS = """Bourne Again
 by Team Absolute Baseline
 

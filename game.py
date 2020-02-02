@@ -6,6 +6,7 @@ from target import Target
 from solid_sprite import Solid
 from player import Player
 from flag import Flag
+from powerup import Powerup
 
 INPUT_PREAMBLE = 'from signals import *\n'
 
@@ -41,6 +42,15 @@ class Game():
 
         self.flag = Flag(60, 24)
 
+        self.powerup = Powerup(80, 120)
+
+        self.upgraded = False
+        self.blocked_functions = [
+            'up',
+            'down',
+            'left'
+        ]
+
         self.locked = False
         self.has_won = False
 
@@ -58,10 +68,13 @@ class Game():
             self.reset_vars()
             try:
                 self.locked = True
-                exec(script)
+                if (self.upgraded
+                        or (not self.upgraded
+                            and not any(bf in script for bf in self.blocked_functions))):
+                    exec(script)
 
             except signals.Help:
-                self.set_msg(signals.HELP)
+                self.set_msg(signals.HELP if self.upgraded else signals.START_HELP)
 
             except signals.Credits:
                 self.set_msg(signals.CREDITS)
@@ -101,13 +114,19 @@ class Game():
             self.typeout()
 
     def draw(self):
-        pyxel.cls(12)
+        pyxel.cls(12 if self.upgraded else 13)
 
         # targets
         [self.draw_target(k, t) for k, t in self.targets.items()]
 
         # walls
         [self.draw_wall(w) for w in self.walls]
+
+        # powerup
+        if not self.upgraded:
+            pyxel.blt(self.powerup.x, self.powerup.y, 0,
+                      48, 0,
+                      16, 16, 0)
 
         # player
         pyxel.blt(self.player.x, self.player.y, 0,
@@ -147,7 +166,7 @@ class Game():
                       84, 20,
                       0)
             pyxel.text(20, 202,
-                'Bourne Again\nGGJ 2020\nrun credits()', 9)
+                       'Bourne Again\nGGJ 2020\nrun credits()', 9)
 
     def read_input(self):
         """Get all the text from the INPUT file."""
@@ -180,6 +199,17 @@ class Game():
             if pyxel.frame_count % 6 == 0:
                 self.player.step_anim()
 
+        if self.player_touching_powerup():
+            if not self.upgraded:
+                msg = """Learned:
+    up(distance)
+    down(distance)
+    left(distance)
+"""
+                self.set_msg(msg)
+
+            self.upgraded = True
+
         self.has_won = self.player_touching_flag()
         if self.has_won:
             self.player.stop()
@@ -209,7 +239,6 @@ class Game():
     def draw_beam(self, angle: float, starttime: int):
         """Draw a beam at the angle for both eyes."""
         elapsed_frames = pyxel.frame_count - starttime
-
 
         color = 10
         if 3 <= elapsed_frames < 6:
@@ -259,6 +288,14 @@ class Game():
                 and self.player.y <= self.flag.y + 16):
             return True
         return False
+
+    def player_touching_powerup(self):
+        """Is the player touching a powerup?"""
+        if (self.player.x + 9 >= self.powerup.x
+                and self.player.x <= self.powerup.x + 9
+                and self.player.y + 11 >= self.powerup.y
+                and self.player.y <= self.powerup.y + 11):
+            return True
 
 
 Game()
