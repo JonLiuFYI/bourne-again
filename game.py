@@ -214,8 +214,8 @@ class Game():
 
         has_collided = [False, False]
 
-        eye1 = (self.player_x + 5, self.player_y + 4)
-        eye2 = (self.player_x + 10, self.player_y + 4)
+        eye1 = (self.player.x + 5, self.player.y + 4)
+        eye2 = (self.player.x + 10, self.player.y + 4)
 
         for wll in self.walls:
            for e in [eye1,eye2]:
@@ -228,7 +228,7 @@ class Game():
                 for yt in range(y,y+16):
                     angle_value = tan(-self.beam_angle)
                     if (yt - 1 <= (angle_value * xt )) and (yt + 1 >= (angle_value * xt)):
-                        distance_x = e[0] - self.player_x
+                        distance_x = e[0] - self.player.x
                         distance_y = e[1] - wll.y
                         has_collided = True
 
@@ -249,26 +249,24 @@ class Game():
             return
 
 
-
-
-
-        #y = (degrees(tan(self.beam_angle)))x +b
-
-
-
-
-
-
-        eye1 = (self.player.x + 5, self.player.y + 4)
-        eye2 = (self.player.x + 10, self.player.y + 4)
-        pyxel.line(eye1[0], eye1[1],
-                   eye1[0] + 1000*cos(self.beam_angle),
-                   eye1[1] + 1000*sin(self.beam_angle),
-                   color)
-        pyxel.line(eye2[0], eye2[1],
-                   eye2[0] + 1000*cos(self.beam_angle),
-                   eye2[1] + 1000*sin(self.beam_angle),
-                   color)
+        if has_collided:
+            pyxel.line(eye1[0], eye1[1],
+            eye1[0] + distance*cos(self.beam_angle),
+            eye1[1] + distance*sin(self.beam_angle),
+            color)
+            pyxel.line(eye2[0], eye2[1],
+            eye2[0] + distance*cos(self.beam_angle),
+            eye2[1] + distance*sin(self.beam_angle),
+            color)
+        else:
+            pyxel.line(eye1[0], eye1[1],
+            eye1[0] + 1000*cos(self.beam_angle),
+            eye1[1] + 1000*sin(self.beam_angle),
+            color)
+            pyxel.line(eye2[0], eye2[1],
+            eye2[0] + 1000*cos(self.beam_angle),
+            eye2[1] + 1000*sin(self.beam_angle),
+            color)
 
 
     def draw_wall(self, sld: Solid):
