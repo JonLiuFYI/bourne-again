@@ -9,6 +9,9 @@ class Player():
         self.deltax = 0
         self.deltay = 0
 
+    def stopped(self):
+        return self.deltax == self.deltay == 0
+
     def update_pos(self):
         if self.deltax > 0:
             self.x += 1

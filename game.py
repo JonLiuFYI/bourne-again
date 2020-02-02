@@ -153,24 +153,19 @@ class Game():
     def move_player(self):
         """Move the player step by step to the new position."""
         # block move if player would collide
-        if self.player.deltax > 0 and self.player_will_collide(1, 0):
+        if ((self.player.deltax > 0 and self.player_will_collide(1, 0))
+                or (self.player.deltax < 0 and self.player_will_collide(-1, 0))
+                or (self.player.deltay > 0 and self.player_will_collide(0, 1))
+                or (self.player.deltay < 0 and self.player_will_collide(0, -1))):
             self.player.stop()
-        if self.player.deltax < 0 and self.player_will_collide(-1, 0):
-            self.player.stop()
-        if self.player.deltay > 0 and self.player_will_collide(0, 1):
-            self.player.stop()
-        if self.player.deltay < 0 and self.player_will_collide(0, -1):
-            self.player.stop()
-
-        # otherwise, move
-        if not (self.player.deltax == self.player.deltay == 0):
+        else:
             self.player.update_pos()
 
         self.has_won = self.player_touching_flag()
         if self.has_won:
             self.player.stop()
 
-        if self.player.deltax == self.player.deltay == 0:
+        if self.player.stopped():
             self.locked = False
 
     def set_msg(self, msg: str):
