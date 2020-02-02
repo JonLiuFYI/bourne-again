@@ -124,8 +124,8 @@ class Game():
         # see() text background
         for l, txt in enumerate(self.seemsg_out.splitlines()):
             pyxel.rect(0, 6*l,
-            4*len(txt) + 2, 7,
-            1)
+                       4*len(txt) + 2, 7,
+                       1)
 
         # see() text
         pyxel.text(1, 1, self.seemsg_out, 7)
@@ -167,12 +167,12 @@ class Game():
         else:
             self.player.update_pos()
 
+        if self.player.stopped():
+            self.locked = False
+
         self.has_won = self.player_touching_flag()
         if self.has_won:
             self.player.stop()
-
-        if self.player.stopped():
-            self.locked = False
 
     def set_msg(self, msg: str):
         """Change the see() message."""
