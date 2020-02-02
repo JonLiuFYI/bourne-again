@@ -136,6 +136,16 @@ class Game():
             )
         if self.has_won:
            pyxel.cls(0)
+           pyxel.blt(
+            64,
+            64,
+            0,
+            0,
+            32,
+            84,
+            20,
+            0,
+            )
 
 
     def read_input(self):
@@ -183,6 +193,7 @@ class Game():
 
         if self.player_x_delta == self.player_y_delta == 0:
             self.locked = False
+        self.check_win_collision()
 
     def stop(self):
         """Forcibly stop moving the player."""
