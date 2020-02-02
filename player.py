@@ -8,6 +8,8 @@ class Player():
         self._anim_state = 0
         self._sprite_pos = [
             (0, 0),
+            (16, 16),
+            (32, 16),
             (16, 16)
         ]
 
@@ -34,7 +36,7 @@ class Player():
             self.deltay += 1
 
     def step_anim(self):
-        self._anim_state = (self._anim_state + 1) % 2
+        self._anim_state = (self._anim_state + 1) % len(self._sprite_pos)
 
     def sprite(self):
         return self._sprite_pos[self._anim_state]

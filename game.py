@@ -173,7 +173,7 @@ class Game():
             self.locked = False
             self.player.reset_anim()
         else:
-            if pyxel.frame_count % 10 == 0:
+            if pyxel.frame_count % 6 == 0:
                 self.player.step_anim()
 
         self.has_won = self.player_touching_flag()
