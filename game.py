@@ -34,7 +34,7 @@ class Game():
             'C': Target(120, 220, 'Target C is in the mood for shawarma')
         }
 
-        self.wall = [
+        self.walls = [
             Solid(30, 160),
             Solid(100, 45),
             Solid(24, 200)
@@ -97,9 +97,11 @@ class Game():
         if not self.locked:
             pyxel.text(0, 234, '[SPACE] run INPUT', 1)
 
+        # targets
         [self.draw_target(k, t) for k, t in self.targets.items()]
 
-        [self.draw_wall(w) for w in self.wall]
+        # walls
+        [self.draw_wall(w) for w in self.walls]
 
         # player
         pyxel.blt(self.player_x, self.player_y, 0,
@@ -107,6 +109,7 @@ class Game():
                   16, 16,
                   0)
 
+        # shot beam
         if self.beam_angle is not None:
             self.draw_beam(self.beam_angle, self.beam_start_time)
 
@@ -129,47 +132,43 @@ class Game():
     def move_player(self):
         """Move the player step by step to the new position."""
         if self.player_x_delta > 0:
-            # if is there is no wall
-            if self.detect_wall_collision(1, 0) == False:
+            if self.player_will_collide(1, 0):
+                self.stop()
+            else:
                 self.player_x += 1
                 self.player_x_delta -= 1
-            else:
-                self.player_x_delta = 0
-                self.player_y_delta = 0
-                self.locked = False
 
         elif self.player_x_delta < 0:
-            # if there is no wall
-            if self.detect_wall_collision(-1, 0) == False:
+            if self.player_will_collide(-1, 0):
+                self.stop()
+            else:
                 self.player_x -= 1
                 self.player_x_delta += 1
-            else:
-                self.player_x_delta = 0
-                self.player_y_delta = 0
-                self.locked = False
 
         if self.player_y_delta > 0:
-            if self.detect_wall_collision(0, 1) == False:
+            if self.player_will_collide(0, 1):
+                self.stop()
+            else:
                 self.player_y += 1
                 self.player_y_delta -= 1
-            else:
-                self.player_x_delta = 0
-                self.player_y_delta = 0
-                self.locked = False
-        # if there is a wall
+
         elif self.player_y_delta < 0:
-            if self.detect_wall_collision(0, -1) == False:
+            if self.player_will_collide(0, -1):
+                self.stop()
+            else:
                 self.player_y -= 1
                 self.player_y_delta += 1
-            else:
-                self.player_x_delta = 0
-                self.player_y_delta = 0
-                self.locked = False
 
         if self.player_x_delta == self.player_y_delta == 0:
             self.locked = False
 
+    def stop(self):
+        """Forcibly stop moving the player."""
+        self.player_x_delta = 0
+        self.player_y_delta = 0
+
     def set_msg(self, msg: str):
+        """Change the see() message."""
         self.seemsg = msg
         self.seemsg_iter = iter(self.seemsg)
 
@@ -181,6 +180,7 @@ class Game():
             self.locked = False
 
     def draw_target(self, name: str, tgt: Target):
+        """Draw the given Target. Put its name in the corner."""
         pyxel.blt(tgt.x, tgt.y, 0,
                   32, 0,
                   16, 16,
@@ -188,6 +188,7 @@ class Game():
         pyxel.text(tgt.x, tgt.y+11, name, 0)
 
     def draw_beam(self, angle: float, starttime: int):
+        """Draw a beam at the angle for both eyes."""
         elapsed_frames = pyxel.frame_count - starttime
 
         color = 10
@@ -219,17 +220,16 @@ class Game():
                   56, 56,
                   0)
 
-    def detect_wall_collision(self, x_inc, y_inc):
-        for w in self.wall:
-            if (
-                self.player_x + x_inc + 14 >= w.x
-                and self.player_x + x_inc <= w.x + 14
-                and self.player_y + y_inc + 15 >= w.y
-                and self.player_y + y_inc <= w.y + 15
-            ):
-                return True
-            else:
-                return False
+    def player_will_collide(self, xdir, ydir):
+        """Will the player enter a solid thing if they move in the given direction?"""
+        out: bool = False
+        for w in self.walls:
+            if (self.player_x + xdir + 14 >= w.x
+                    and self.player_x + xdir <= w.x + 14
+                    and self.player_y + ydir + 15 >= w.y
+                    and self.player_y + ydir <= w.y + 15):
+                out = True
+        return out
 
 
 Game()
