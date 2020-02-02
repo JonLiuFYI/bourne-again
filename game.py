@@ -109,7 +109,7 @@ class Game():
 
         # player
         pyxel.blt(self.player.x, self.player.y, 0,
-                  0, 0,
+                  *self.player.sprite(),
                   16, 16,
                   0)
 
@@ -117,9 +117,9 @@ class Game():
         if self.beam_angle is not None:
             self.draw_beam(self.beam_angle, self.beam_start_time)
 
-        # draw flag
+        # flag
         pyxel.blt(self.flag.x, self.flag.y, 0,
-                  16, 0,
+                  *self.flag.step_anim(pyxel.frame_count),
                   16, 16,
                   0)
 
@@ -140,10 +140,12 @@ class Game():
 
         if self.has_won:
             pyxel.cls(0)
-            pyxel.blt(64, 64, 0,
+            pyxel.blt(78, 64, 0,
                       0, 32,
                       84, 20,
                       0)
+            pyxel.text(20, 202,
+                'Bourne Again\nGGJ 2020\nrun credits()', 9)
 
     def read_input(self):
         """Get all the text from the INPUT file."""
@@ -171,6 +173,10 @@ class Game():
 
         if self.player.stopped():
             self.locked = False
+            self.player.reset_anim()
+        else:
+            if pyxel.frame_count % 6 == 0:
+                self.player.step_anim()
 
         self.has_won = self.player_touching_flag()
         if self.has_won:
