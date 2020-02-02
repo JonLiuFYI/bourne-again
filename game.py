@@ -67,7 +67,7 @@ class Game():
                 if see.msg in self.targets:
                     tgt: Target = self.targets[see.msg]
                     self.set_msg(
-                        f'{see.msg} ({tgt.x}, {tgt.y})\n{tgt.comment}')
+                        f'{see.msg} ({tgt.x}, {tgt.y}) - Relative to you: ({tgt.x-self.player.x}, {tgt.y-self.player.y})\n{tgt.comment}')
                 else:
                     self.set_msg(f'{see.msg}: no such target')
 
