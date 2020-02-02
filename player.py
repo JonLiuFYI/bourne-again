@@ -8,3 +8,18 @@ class Player():
     def stop(self):
         self.deltax = 0
         self.deltay = 0
+
+    def update_pos(self):
+        if self.deltax > 0:
+            self.x += 1
+            self.deltax -= 1
+        elif self.deltax < 0:
+            self.x -= 1
+            self.deltax += 1
+
+        if self.deltay > 0:
+            self.y += 1
+            self.deltay -= 1
+        elif self.deltay < 0:
+            self.y -= 1
+            self.deltay += 1
