@@ -5,17 +5,34 @@ HELP = """Enter commands to do stuff.
     left(distance)
     up(distance)
     down(distance) - Move that many pixels over
+    shoot(angle) - Shoot a beam at that angle
+
+    credits() - Who made this, anyway?
+"""
+
+CREDITS = """Bourne Again
+by Team Absolute Baseline
+
+Jon Liu: code, music
+Andre Giroux: code, graphics
+
+Global Game Jam 2020 at Shopify, in Ottawa
 """
 
 
 class Help(Exception):
-    def __init(self):
+    def __init__(self):
         pass
 
 
 class See(Exception):
     def __init__(self, msg: str):
         self.msg = msg
+
+
+class Credits(Exception):
+    def __init__(self):
+        pass
 
 
 class Move(Exception):
@@ -54,6 +71,11 @@ def help():
 def see(msg: str):
     """Display location of a target"""
     raise See(msg)
+
+
+def credits():
+    """Show credits."""
+    raise Credits
 
 
 def right(dist: int):

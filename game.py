@@ -4,6 +4,8 @@ import pyxel
 import signals
 from target import Target
 from solid_sprite import Solid
+from player import Player
+from flag import Flag
 
 
 
@@ -22,10 +24,7 @@ class Game():
         self.seemsg_iter = ''
         self.seemsg_out = ''
 
-        self.player_x = 30
-        self.player_x_delta = 0
-        self.player_y = 120
-        self.player_y_delta = 0
+        self.player = Player(30, 120)
 
         self.beam_angle = None
         self.beam_start_time = 0
@@ -33,7 +32,7 @@ class Game():
         self.targets = {
             'A': Target(200, 100, 'Target A feels lonely'),
             'B': Target(1, 20, 'Fortune awaits Target B'),
-            'C': Target(120, 220, 'Target C is in the mood for shawarma')
+            'C': Target(120, 199, 'Target C is in the mood for shawarma')
         }
 
         self.walls = [
@@ -42,11 +41,9 @@ class Game():
             Solid(24, 200)
         ]
 
-        self.flag_x = 60
-        self.flag_y = 0
+        self.flag = Flag(60, 24)
 
         self.locked = False
-
         self.has_won = False
 
         pyxel.run(self.update, self.draw)
@@ -67,26 +64,29 @@ class Game():
             except signals.Help:
                 self.set_msg(signals.HELP)
 
+            except signals.Credits:
+                self.set_msg(signals.CREDITS)
+
             except signals.See as see:
                 """Start typing out info on the named target."""
                 if see.msg in self.targets:
                     tgt: Target = self.targets[see.msg]
                     self.set_msg(
-                        f'{see.msg} ({tgt.x}, {tgt.y})\n{tgt.comment}')
+                        f'{see.msg} ({tgt.x}, {tgt.y}) - Relative to you: ({tgt.x-self.player.x}, {tgt.y-self.player.y})\n{tgt.comment}')
                 else:
                     self.set_msg(f'{see.msg}: no such target')
 
             except signals.Right as right:
-                self.player_x_delta = right.dist
+                self.player.deltax = right.dist
 
             except signals.Left as left:
-                self.player_x_delta = -left.dist
+                self.player.deltax = -left.dist
 
             except signals.Up as up:
-                self.player_y_delta = -up.dist
+                self.player.deltay = -up.dist
 
             except signals.Down as down:
-                self.player_y_delta = down.dist
+                self.player.deltay = down.dist
 
             except signals.Shoot as shot:
                 self.beam_angle = radians(-shot.angle)
@@ -95,16 +95,13 @@ class Game():
             except:
                 pass
 
-        if self.player_x_delta != 0 or self.player_y_delta != 0:
-            self.move_player()
+        self.move_player()
 
         if len(self.seemsg) > 0:
             self.typeout()
 
     def draw(self):
         pyxel.cls(12)
-        if not self.locked:
-            pyxel.text(0, 234, '[SPACE] run INPUT', 1)
 
         # targets
         [self.draw_target(k, t) for k, t in self.targets.items()]
@@ -113,8 +110,8 @@ class Game():
         [self.draw_wall(w) for w in self.walls]
 
         # player
-        pyxel.blt(self.player_x, self.player_y, 0,
-                  0, 0,
+        pyxel.blt(self.player.x, self.player.y, 0,
+                  *self.player.sprite(),
                   16, 16,
                   0)
 
@@ -122,33 +119,35 @@ class Game():
         if self.beam_angle is not None:
             self.draw_beam(self.beam_angle, self.beam_start_time)
 
+        # flag
+        pyxel.blt(self.flag.x, self.flag.y, 0,
+                  *self.flag.step_anim(pyxel.frame_count),
+                  16, 16,
+                  0)
+
+        # see() text background
+        for l, txt in enumerate(self.seemsg_out.splitlines()):
+            pyxel.rect(0, 6*l,
+                       4*len(txt) + 2, 7,
+                       1)
+
         # see() text
-        pyxel.text(1, 1, self.seemsg_out, 0)
+        pyxel.text(1, 1, self.seemsg_out, 7)
 
-         #draw flag
-        pyxel.blt(
-            self.flag_x,
-            self.flag_y,
-            0,
-            16,
-            0,
-            16,
-            16,
-            0,
-            )
+        # exec prompt
+        if not self.locked:
+            pyxel.rect(0, 232,
+                       240, 8, 0)
+            pyxel.text(0, 234, '[SPACE] run INPUT', 7)
+
         if self.has_won:
-           pyxel.cls(0)
-           pyxel.blt(
-            64,
-            64,
-            0,
-            0,
-            32,
-            84,
-            20,
-            0,
-            )
-
+            pyxel.cls(0)
+            pyxel.blt(78, 64, 0,
+                      0, 32,
+                      84, 20,
+                      0)
+            pyxel.text(20, 202,
+                'Bourne Again\nGGJ 2020\nrun credits()', 9)
 
     def read_input(self):
         """Get all the text from the INPUT file."""
@@ -165,42 +164,25 @@ class Game():
 
     def move_player(self):
         """Move the player step by step to the new position."""
-        if self.player_x_delta > 0:
-            if self.player_will_collide(1, 0):
-                self.stop()
-            else:
-                self.player_x += 1
-                self.player_x_delta -= 1
+        # block move if player would collide
+        if ((self.player.deltax > 0 and self.player_will_collide(1, 0))
+                or (self.player.deltax < 0 and self.player_will_collide(-1, 0))
+                or (self.player.deltay > 0 and self.player_will_collide(0, 1))
+                or (self.player.deltay < 0 and self.player_will_collide(0, -1))):
+            self.player.stop()
+        else:
+            self.player.update_pos()
 
-        elif self.player_x_delta < 0:
-            if self.player_will_collide(-1, 0):
-                self.stop()
-            else:
-                self.player_x -= 1
-                self.player_x_delta += 1
-
-        if self.player_y_delta > 0:
-            if self.player_will_collide(0, 1):
-                self.stop()
-            else:
-                self.player_y += 1
-                self.player_y_delta -= 1
-
-        elif self.player_y_delta < 0:
-            if self.player_will_collide(0, -1):
-                self.stop()
-            else:
-                self.player_y -= 1
-                self.player_y_delta += 1
-
-        if self.player_x_delta == self.player_y_delta == 0:
+        if self.player.stopped():
             self.locked = False
-        self.check_win_collision()
+            self.player.reset_anim()
+        else:
+            if pyxel.frame_count % 6 == 0:
+                self.player.step_anim()
 
-    def stop(self):
-        """Forcibly stop moving the player."""
-        self.player_x_delta = 0
-        self.player_y_delta = 0
+        self.has_won = self.player_touching_flag()
+        if self.has_won:
+            self.player.stop()
 
     def set_msg(self, msg: str):
         """Change the see() message."""
@@ -229,18 +211,18 @@ class Game():
         distance_x = 0
         distance_y = 0
 
-        
+
         has_collided = [False, False]
 
         eye1 = (self.player_x + 5, self.player_y + 4)
         eye2 = (self.player_x + 10, self.player_y + 4)
-        
+
         for wll in self.walls:
            for e in [eye1,eye2]:
             x = wll.x - e[0]
-            y = e[1] -  wll.y            
-            
-            
+            y = e[1] -  wll.y
+
+
 
             for xt in range(x,x+16):
                 for yt in range(y,y+16):
@@ -265,35 +247,28 @@ class Game():
             self.beam_angle = None
             self.locked = False
             return
-        
-       
 
-        if has_collided:
-            pyxel.line(eye1[0], eye1[1],
-            eye1[0] + distance*cos(self.beam_angle),
-            eye1[1] + distance*sin(self.beam_angle),
-            color)
-            pyxel.line(eye2[0], eye2[1],
-            eye2[0] + distance*cos(self.beam_angle),
-            eye2[1] + distance*sin(self.beam_angle),
-            color)
-        else:
-            pyxel.line(eye1[0], eye1[1],
-            eye1[0] + 1000*cos(self.beam_angle),
-            eye1[1] + 1000*sin(self.beam_angle),
-            color)
-            pyxel.line(eye2[0], eye2[1],
-            eye2[0] + 1000*cos(self.beam_angle),
-            eye2[1] + 1000*sin(self.beam_angle),
-            color)
+
 
 
 
         #y = (degrees(tan(self.beam_angle)))x +b
-       
-                        
 
 
+
+
+
+
+        eye1 = (self.player.x + 5, self.player.y + 4)
+        eye2 = (self.player.x + 10, self.player.y + 4)
+        pyxel.line(eye1[0], eye1[1],
+                   eye1[0] + 1000*cos(self.beam_angle),
+                   eye1[1] + 1000*sin(self.beam_angle),
+                   color)
+        pyxel.line(eye2[0], eye2[1],
+                   eye2[0] + 1000*cos(self.beam_angle),
+                   eye2[1] + 1000*sin(self.beam_angle),
+                   color)
 
 
     def draw_wall(self, sld: Solid):
@@ -306,23 +281,21 @@ class Game():
         """Will the player enter a solid thing if they move in the given direction?"""
         out: bool = False
         for w in self.walls:
-            if (self.player_x + xdir + 14 >= w.x
-                    and self.player_x + xdir <= w.x + 14
-                    and self.player_y + ydir + 15 >= w.y
-                    and self.player_y + ydir <= w.y + 15):
+            if (self.player.x + xdir + 14 >= w.x
+                    and self.player.x + xdir <= w.x + 14
+                    and self.player.y + ydir + 15 >= w.y
+                    and self.player.y + ydir <= w.y + 15):
                 out = True
         return out
 
-   #COLLISION BETWEEN PLAYER AND FLAG
-    def check_win_collision(self):
-         if (
-                self.player_x + 9 >= self.flag_x
-                and self.player_x <= self.flag_x + 9
-                and self.player_y + 16 >= self.flag_y
-                and self.player_y <= self.flag_y + 16
-            ):
-                self.has_won = True
-
+    def player_touching_flag(self):
+        """Is the player touching the flag?"""
+        if (self.player.x + 9 >= self.flag.x
+                and self.player.x <= self.flag.x + 9
+                and self.player.y + 16 >= self.flag.y
+                and self.player.y <= self.flag.y + 16):
+            return True
+        return False
 
 
 Game()
