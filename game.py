@@ -44,6 +44,7 @@ class Game():
         self.locked = False
         self.has_won = False
 
+        pyxel.playm(1, loop=True)
         pyxel.run(self.update, self.draw)
 
     def update(self):
