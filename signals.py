@@ -6,6 +6,8 @@ HELP = """Enter commands to do stuff.
     up(distance)
     down(distance) - Move that many pixels over
     shoot(angle) - Shoot a beam at that angle
+
+    credits() - Who made this, anyway?
 """
 
 

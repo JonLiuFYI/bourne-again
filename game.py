@@ -121,8 +121,14 @@ class Game():
                   16, 16,
                   0)
 
+        # see() text background
+        for l, txt in enumerate(self.seemsg_out.splitlines()):
+            pyxel.rect(0, 6*l,
+            4*len(txt) + 2, 7,
+            1)
+
         # see() text
-        pyxel.text(1, 1, self.seemsg_out, 0)
+        pyxel.text(1, 1, self.seemsg_out, 7)
 
         # exec prompt
         if not self.locked:
