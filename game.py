@@ -140,10 +140,12 @@ class Game():
 
         if self.has_won:
             pyxel.cls(0)
-            pyxel.blt(64, 64, 0,
+            pyxel.blt(78, 64, 0,
                       0, 32,
                       84, 20,
                       0)
+            pyxel.text(20, 202,
+                'Bourne Again\nGGJ 2020\nrun credits()', 9)
 
     def read_input(self):
         """Get all the text from the INPUT file."""
