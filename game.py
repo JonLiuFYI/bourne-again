@@ -272,6 +272,15 @@ class Game():
     def player_will_collide(self, xdir, ydir):
         """Will the player enter a solid thing if they move in the given direction?"""
         out: bool = False
+
+        # boundaries
+        if (self.player.x + xdir + 14 >= 240
+                or self.player.x + xdir <= 0
+                or self.player.y + ydir + 15 >= 240
+                or self.player.y + ydir <= 0):
+            return True
+
+        # walls
         for w in self.walls:
             if (self.player.x + xdir + 14 >= w.x
                     and self.player.x + xdir <= w.x + 14
