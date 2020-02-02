@@ -1,9 +1,11 @@
-from math import sin, cos, radians
+from math import sin, cos, radians, tan, degrees, sqrt
 
 import pyxel
 import signals
 from target import Target
 from solid_sprite import Solid
+
+
 
 INPUT_PREAMBLE = 'from signals import *\n'
 
@@ -35,7 +37,7 @@ class Game():
         }
 
         self.walls = [
-            Solid(30, 160),
+            Solid(45, 160),
             Solid(100, 45),
             Solid(24, 200)
         ]
@@ -222,6 +224,34 @@ class Game():
 
     def draw_beam(self, angle: float, starttime: int):
         """Draw a beam at the angle for both eyes."""
+
+
+        distance_x = 0
+        distance_y = 0
+
+        
+        has_collided = [False, False]
+
+        eye1 = (self.player_x + 5, self.player_y + 4)
+        eye2 = (self.player_x + 10, self.player_y + 4)
+        
+        for wll in self.walls:
+           for e in [eye1,eye2]:
+            x = wll.x - e[0]
+            y = e[1] -  wll.y            
+            
+            
+
+            for xt in range(x,x+16):
+                for yt in range(y,y+16):
+                    angle_value = tan(-self.beam_angle)
+                    if (yt - 1 <= (angle_value * xt )) and (yt + 1 >= (angle_value * xt)):
+                        distance_x = e[0] - self.player_x
+                        distance_y = e[1] - wll.y
+                        has_collided = True
+
+
+        distance = sqrt((distance_x**2) + (distance_y**2))
         elapsed_frames = pyxel.frame_count - starttime
 
         color = 10
@@ -235,19 +265,35 @@ class Game():
             self.beam_angle = None
             self.locked = False
             return
-
-        eye1 = (self.player_x + 5, self.player_y + 4)
-        eye2 = (self.player_x + 10, self.player_y + 4)
-        pyxel.line(eye1[0], eye1[1],
-                   eye1[0] + 1000*cos(self.beam_angle),
-                   eye1[1] + 1000*sin(self.beam_angle),
-                   color)
-        pyxel.line(eye2[0], eye2[1],
-                   eye2[0] + 1000*cos(self.beam_angle),
-                   eye2[1] + 1000*sin(self.beam_angle),
-                   color)
-
+        
        
+
+        if has_collided:
+            pyxel.line(eye1[0], eye1[1],
+            eye1[0] + distance*cos(self.beam_angle),
+            eye1[1] + distance*sin(self.beam_angle),
+            color)
+            pyxel.line(eye2[0], eye2[1],
+            eye2[0] + distance*cos(self.beam_angle),
+            eye2[1] + distance*sin(self.beam_angle),
+            color)
+        else:
+            pyxel.line(eye1[0], eye1[1],
+            eye1[0] + 1000*cos(self.beam_angle),
+            eye1[1] + 1000*sin(self.beam_angle),
+            color)
+            pyxel.line(eye2[0], eye2[1],
+            eye2[0] + 1000*cos(self.beam_angle),
+            eye2[1] + 1000*sin(self.beam_angle),
+            color)
+
+
+
+        #y = (degrees(tan(self.beam_angle)))x +b
+       
+                        
+
+
 
 
     def draw_wall(self, sld: Solid):
