@@ -41,6 +41,13 @@ class Game():
 
         self.flag = Flag(60, 24)
 
+        self.upgraded = False
+        self.blocked_functions = [
+            'up',
+            'down',
+            'left'
+        ]
+
         self.locked = False
         self.has_won = False
 
@@ -58,7 +65,10 @@ class Game():
             self.reset_vars()
             try:
                 self.locked = True
-                exec(script)
+                if (self.upgraded
+                        or (not self.upgraded
+                            and not any(bf in script for bf in self.blocked_functions))):
+                    exec(script)
 
             except signals.Help:
                 self.set_msg(signals.HELP)
@@ -147,7 +157,7 @@ class Game():
                       84, 20,
                       0)
             pyxel.text(20, 202,
-                'Bourne Again\nGGJ 2020\nrun credits()', 9)
+                       'Bourne Again\nGGJ 2020\nrun credits()', 9)
 
     def read_input(self):
         """Get all the text from the INPUT file."""
@@ -209,7 +219,6 @@ class Game():
     def draw_beam(self, angle: float, starttime: int):
         """Draw a beam at the angle for both eyes."""
         elapsed_frames = pyxel.frame_count - starttime
-
 
         color = 10
         if 3 <= elapsed_frames < 6:
