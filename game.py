@@ -5,6 +5,7 @@ import signals
 from target import Target
 from solid_sprite import Solid
 from player import Player
+from flag import Flag
 
 INPUT_PREAMBLE = 'from signals import *\n'
 
@@ -38,8 +39,7 @@ class Game():
             Solid(24, 200)
         ]
 
-        self.flag_x = 60
-        self.flag_y = 0
+        self.flag = Flag(60, 24)
 
         self.locked = False
         self.has_won = False
@@ -115,7 +115,7 @@ class Game():
             self.draw_beam(self.beam_angle, self.beam_start_time)
 
         # draw flag
-        pyxel.blt(self.flag_x, self.flag_y, 0,
+        pyxel.blt(self.flag.x, self.flag.y, 0,
                   16, 0,
                   16, 16,
                   0)
@@ -239,10 +239,10 @@ class Game():
 
     def player_touching_flag(self):
         """Is the player touching the flag?"""
-        if (self.player.x + 9 >= self.flag_x
-                and self.player.x <= self.flag_x + 9
-                and self.player.y + 16 >= self.flag_y
-                and self.player.y <= self.flag_y + 16):
+        if (self.player.x + 9 >= self.flag.x
+                and self.player.x <= self.flag.x + 9
+                and self.player.y + 16 >= self.flag.y
+                and self.player.y <= self.flag.y + 16):
             return True
         return False
 
