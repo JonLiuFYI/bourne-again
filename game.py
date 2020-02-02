@@ -90,8 +90,7 @@ class Game():
             except:
                 pass
 
-        if self.player.deltax != 0 or self.player.deltay != 0:
-            self.move_player()
+        self.move_player()
 
         if len(self.seemsg) > 0:
             self.typeout()
