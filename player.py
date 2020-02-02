@@ -5,6 +5,12 @@ class Player():
         self.deltax = 0
         self.deltay = 0
 
+        self._anim_state = 0
+        self._sprite_pos = [
+            (0, 0),
+            (16, 16)
+        ]
+
     def stop(self):
         self.deltax = 0
         self.deltay = 0
@@ -26,3 +32,12 @@ class Player():
         elif self.deltay < 0:
             self.y -= 1
             self.deltay += 1
+
+    def step_anim(self):
+        self._anim_state = (self._anim_state + 1) % 2
+
+    def sprite(self):
+        return self._sprite_pos[self._anim_state]
+
+    def reset_anim(self):
+        self._anim_state = 0

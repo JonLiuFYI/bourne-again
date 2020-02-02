@@ -109,7 +109,7 @@ class Game():
 
         # player
         pyxel.blt(self.player.x, self.player.y, 0,
-                  0, 0,
+                  *self.player.sprite(),
                   16, 16,
                   0)
 
@@ -171,6 +171,10 @@ class Game():
 
         if self.player.stopped():
             self.locked = False
+            self.player.reset_anim()
+        else:
+            if pyxel.frame_count % 10 == 0:
+                self.player.step_anim()
 
         self.has_won = self.player_touching_flag()
         if self.has_won:
