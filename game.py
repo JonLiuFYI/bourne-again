@@ -127,7 +127,7 @@ class Game():
         # exec prompt
         if not self.locked:
             pyxel.rect(0, 232,
-                    240, 8, 0)
+                       240, 8, 0)
             pyxel.text(0, 234, '[SPACE] run INPUT', 7)
 
         if self.has_won:
@@ -186,11 +186,6 @@ class Game():
 
         if self.player.deltax == self.player.deltay == 0:
             self.locked = False
-
-    def stop(self):
-        """Forcibly stop moving the player."""
-        self.player.deltax = 0
-        self.player.deltay = 0
 
     def set_msg(self, msg: str):
         """Change the see() message."""
