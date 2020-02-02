@@ -29,7 +29,7 @@ class Game():
         self.targets = {
             'A': Target(200, 100, 'Target A feels lonely'),
             'B': Target(1, 20, 'Fortune awaits Target B'),
-            'C': Target(120, 220, 'Target C is in the mood for shawarma')
+            'C': Target(120, 199, 'Target C is in the mood for shawarma')
         }
 
         self.walls = [
@@ -98,8 +98,6 @@ class Game():
 
     def draw(self):
         pyxel.cls(12)
-        if not self.locked:
-            pyxel.text(0, 234, '[SPACE] run INPUT', 1)
 
         # targets
         [self.draw_target(k, t) for k, t in self.targets.items()]
@@ -117,14 +115,21 @@ class Game():
         if self.beam_angle is not None:
             self.draw_beam(self.beam_angle, self.beam_start_time)
 
-        # see() text
-        pyxel.text(1, 1, self.seemsg_out, 0)
-
         # draw flag
         pyxel.blt(self.flag_x, self.flag_y, 0,
                   16, 0,
                   16, 16,
                   0)
+
+        # see() text
+        pyxel.text(1, 1, self.seemsg_out, 0)
+
+        # exec prompt
+        if not self.locked:
+            pyxel.rect(0, 232,
+                    240, 8, 0)
+            pyxel.text(0, 234, '[SPACE] run INPUT', 7)
+
         if self.has_won:
             pyxel.cls(0)
             pyxel.blt(64, 64, 0,
