@@ -4,3 +4,7 @@ class Player():
         self.y = y
         self.deltax = 0
         self.deltay = 0
+
+    def stop(self):
+        self.deltax = 0
+        self.deltay = 0

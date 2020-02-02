@@ -149,35 +149,35 @@ class Game():
         """Move the player step by step to the new position."""
         if self.player.deltax > 0:
             if self.player_will_collide(1, 0):
-                self.stop()
+                self.player.stop()
             else:
                 self.player.x += 1
                 self.player.deltax -= 1
 
         elif self.player.deltax < 0:
             if self.player_will_collide(-1, 0):
-                self.stop()
+                self.player.stop()
             else:
                 self.player.x -= 1
                 self.player.deltax += 1
 
         if self.player.deltay > 0:
             if self.player_will_collide(0, 1):
-                self.stop()
+                self.player.stop()
             else:
                 self.player.y += 1
                 self.player.deltay -= 1
 
         elif self.player.deltay < 0:
             if self.player_will_collide(0, -1):
-                self.stop()
+                self.player.stop()
             else:
                 self.player.y -= 1
                 self.player.deltay += 1
 
         self.has_won = self.player_touching_flag()
         if self.has_won:
-            self.stop()
+            self.player.stop()
 
         if self.player.deltax == self.player.deltay == 0:
             self.locked = False
