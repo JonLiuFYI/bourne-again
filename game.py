@@ -242,7 +242,7 @@ class Game():
     def draw_wall(self, sld: Solid):
         pyxel.blt(sld.x, sld.y, 0,
                   0, 16,
-                  56, 56,
+                  16, 16,
                   0)
 
     def player_will_collide(self, xdir, ydir):
