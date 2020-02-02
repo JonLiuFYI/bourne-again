@@ -62,6 +62,9 @@ class Game():
             except signals.Help:
                 self.set_msg(signals.HELP)
 
+            except signals.Credits:
+                self.set_msg(signals.CREDITS)
+
             except signals.See as see:
                 """Start typing out info on the named target."""
                 if see.msg in self.targets:
