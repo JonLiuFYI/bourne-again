@@ -27,16 +27,19 @@ class Game():
         self.player = Player(30, 120)
 
         self.beam_angle = None
+        self.inputed_angle = None
         self.beam_start_time = 0
 
+        self.wll_index = 0
+
         self.targets = {
-            'A': Target(200, 100, 'Target A feels lonely'),
+            'A': Target(200, 120, 'Target A feels lonely'),
             'B': Target(1, 20, 'Fortune awaits Target B'),
             'C': Target(120, 199, 'Target C is in the mood for shawarma')
         }
 
         self.walls = [
-            Solid(45, 160),
+            Solid(150, 120),
             Solid(100, 45),
             Solid(24, 200)
         ]
@@ -45,6 +48,12 @@ class Game():
 
         self.locked = False
         self.has_won = False
+
+        
+        
+        self.raycast_distance = 0
+        self.raycast_has_collided = False
+
 
         pyxel.run(self.update, self.draw)
 
@@ -89,6 +98,7 @@ class Game():
                 self.player.deltay = down.dist
 
             except signals.Shoot as shot:
+                self.inputed_angle = shot.angle % 360
                 self.beam_angle = radians(-shot.angle)
                 self.beam_start_time = pyxel.frame_count
 
@@ -208,32 +218,13 @@ class Game():
         """Draw a beam at the angle for both eyes."""
 
 
-        distance_x = 0
-        distance_y = 0
-
-
-        has_collided = [False, False]
 
         eye1 = (self.player.x + 5, self.player.y + 4)
         eye2 = (self.player.x + 10, self.player.y + 4)
 
-        for wll in self.walls:
-           for e in [eye1,eye2]:
-            x = wll.x - e[0]
-            y = e[1] -  wll.y
-
-
-
-            for xt in range(x,x+16):
-                for yt in range(y,y+16):
-                    angle_value = tan(-self.beam_angle)
-                    if (yt - 1 <= (angle_value * xt )) and (yt + 1 >= (angle_value * xt)):
-                        distance_x = e[0] - self.player.x
-                        distance_y = e[1] - wll.y
-                        has_collided = True
-
-
-        distance = sqrt((distance_x**2) + (distance_y**2))
+        self.raycast_has_collided = self.detect_raycast_colision(eye1,eye2)
+       
+        
         elapsed_frames = pyxel.frame_count - starttime
 
         color = 10
@@ -249,15 +240,17 @@ class Game():
             return
 
 
-        if has_collided:
+        if self.raycast_has_collided:
             pyxel.line(eye1[0], eye1[1],
-            eye1[0] + distance*cos(self.beam_angle),
-            eye1[1] + distance*sin(self.beam_angle),
+            eye1[0] + self.raycast_distance*cos(self.beam_angle),
+            eye1[1] + self.raycast_distance*sin(self.beam_angle),
             color)
             pyxel.line(eye2[0], eye2[1],
-            eye2[0] + distance*cos(self.beam_angle),
-            eye2[1] + distance*sin(self.beam_angle),
+            eye2[0] + self.raycast_distance*cos(self.beam_angle),
+            eye2[1] + self.raycast_distance*sin(self.beam_angle),
             color)
+            self.walls.pop(self.wll_index)
+            self.raycast_has_collided = False
         else:
             pyxel.line(eye1[0], eye1[1],
             eye1[0] + 1000*cos(self.beam_angle),
@@ -295,5 +288,64 @@ class Game():
             return True
         return False
 
+
+
+    def detect_raycast_colision(self, eye1,eye2):
+        self.wll_index = 0
+        for wll in self.walls:
+            
+           for e in [eye1,eye2]:
+            x = wll.x - e[0]
+            y = e[1] -  wll.y
+
+            for xt in range(x,x+16):
+                for yt in range(y-16,y):
+                    if(self.inputed_angle == 90 or self.inputed_angle == 270):
+                        if(self.inputed_angle == 90):
+                            if (xt == 0 and yt > e[1]):
+                                self.raycast_distance = wll.y - e[1]
+                                #print("hit down")
+                                #self.walls.pop(self.wll_index)
+                                return True
+
+                        if (self.inputed_angle  == 270):
+                             if (xt == 0 and yt < e[1]):
+                                self.raycast_distance = wll.y - e[1]
+                                #print("hit up")
+                                #self.walls.pop(self.wll_index)
+                                return True
+
+                    if(self.inputed_angle == 180 or self.inputed_angle == 0):
+                        
+                        if(self.inputed_angle == 0):
+                            if (yt == 0 and yt < e[1]):
+                                #print(f'is horizontal {xt}')
+                                if(yt == 0):
+                                    self.raycast_distance = wll.x - e[0]
+                                    #print("hit right")
+                                    #self.walls.pop(self.wll_index)
+                                    return True
+
+                        if(self.inputed_angle == 180):
+                            if (yt == 0 and yt > e[1]):
+                                #print(f'is horizontal {xt}')
+                                if(yt == 0):
+                                    self.raycast_distance = wll.x - e[0]
+                                    #print("hit left")
+                                    #self.walls.pop(self.wll_index)
+                                    return True
+
+                    else:
+                        angle_value = tan(abs(self.beam_angle))
+                    
+                        #print(angle_value)
+                        if (yt - 1 <= (angle_value * xt )) and (yt + 1 >= (angle_value * xt)):
+                            #print("distance standard")
+                            self.raycast_distance = sqrt(((wll.x - e[0])**2) + ((e[1] - wll.y)**2))
+                            #print("hit")
+                            #self.walls.pop(self.wll_index)
+                            return True
+        self.wll_index+=1
+        return False
 
 Game()
