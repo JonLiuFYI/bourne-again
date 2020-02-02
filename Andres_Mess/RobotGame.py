@@ -153,7 +153,7 @@ class RobotGame:
             0,
             )
 
-         #draw target
+         #draw flag
         pyxel.blt(
             self.flag_x,
             self.flag_y,

@@ -40,13 +40,20 @@ class Game():
             Solid(24, 200)
         ]
 
+        self.flag_x = 60
+        self.flag_y = 0
+
         self.locked = False
+
+        self.has_won = False
 
         pyxel.run(self.update, self.draw)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_ESCAPE):
             pyxel.quit()
+        if pyxel.btnp(pyxel.KEY_W):
+            self.has_won = True
 
         if not self.locked and pyxel.btnr(pyxel.KEY_SPACE):
             script = INPUT_PREAMBLE + self.read_input()
@@ -116,6 +123,31 @@ class Game():
         # see() text
         pyxel.text(1, 1, self.seemsg_out, 0)
 
+         #draw flag
+        pyxel.blt(
+            self.flag_x,
+            self.flag_y,
+            0,
+            16,
+            0,
+            16,
+            16,
+            0,
+            )
+        if self.has_won:
+           pyxel.cls(0)
+           pyxel.blt(
+            64,
+            64,
+            0,
+            0,
+            32,
+            84,
+            20,
+            0,
+            )
+
+
     def read_input(self):
         """Get all the text from the INPUT file."""
         f = open('INPUT', 'r')
@@ -161,6 +193,7 @@ class Game():
 
         if self.player_x_delta == self.player_y_delta == 0:
             self.locked = False
+        self.check_win_collision()
 
     def stop(self):
         """Forcibly stop moving the player."""
@@ -214,6 +247,9 @@ class Game():
                    eye2[1] + 1000*sin(self.beam_angle),
                    color)
 
+       
+
+
     def draw_wall(self, sld: Solid):
         pyxel.blt(sld.x, sld.y, 0,
                   0, 16,
@@ -230,6 +266,17 @@ class Game():
                     and self.player_y + ydir <= w.y + 15):
                 out = True
         return out
+
+   #COLLISION BETWEEN PLAYER AND FLAG
+    def check_win_collision(self):
+         if (
+                self.player_x + 9 >= self.flag_x
+                and self.player_x <= self.flag_x + 9
+                and self.player_y + 16 >= self.flag_y
+                and self.player_y <= self.flag_y + 16
+            ):
+                self.has_won = True
+
 
 
 Game()
