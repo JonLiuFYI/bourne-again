@@ -191,6 +191,8 @@ class Game():
     def typeout(self):
         """Type out see() text one letter at a time."""
         if len(self.seemsg_out) < len(self.seemsg):
+            self.locked = True
+            pyxel.play(3, 1)
             self.seemsg_out += next(self.seemsg_iter)
         else:
             self.locked = False
