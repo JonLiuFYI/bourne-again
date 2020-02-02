@@ -31,7 +31,7 @@ class Game():
         self.inputed_angle = None
         self.beam_start_time = 0
 
-        self.wll_index = 0
+        #self.wll_index = 0
 
         self.targets = {
             'A': Target(200, 120, 'Target A feels lonely'),
@@ -286,7 +286,6 @@ class Game():
             eye2[0] + self.raycast_distance*cos(self.beam_angle),
             eye2[1] + self.raycast_distance*sin(self.beam_angle),
             color)
-            self.walls.pop(self.wll_index)
             self.raycast_has_collided = False
         else:
             pyxel.line(eye1[0], eye1[1],
@@ -345,7 +344,7 @@ class Game():
 
 
     def detect_raycast_colision(self, eye1,eye2):
-        self.wll_index = 0
+        wll_index = 0
         for wll in self.walls:
 
            for e in [eye1,eye2]:
@@ -359,14 +358,14 @@ class Game():
                             if (xt == 0 and yt > e[1]):
                                 self.raycast_distance = wll.y - e[1]
                                 #print("hit down")
-                                #self.walls.pop(self.wll_index)
+                                #self.walls.pop(wll_index)
                                 return True
 
                         if (self.inputed_angle  == 270):
                              if (xt == 0 and yt < e[1]):
                                 self.raycast_distance = wll.y - e[1]
                                 #print("hit up")
-                                #self.walls.pop(self.wll_index)
+                                #self.walls.pop(wll_index)
                                 return True
 
                     if(self.inputed_angle == 180 or self.inputed_angle == 0):
@@ -377,7 +376,7 @@ class Game():
                                 if(yt == 0):
                                     self.raycast_distance = wll.x - e[0]
                                     #print("hit right")
-                                    #self.walls.pop(self.wll_index)
+                                    #self.walls.pop(wll_index)
                                     return True
 
                         if(self.inputed_angle == 180):
@@ -386,7 +385,7 @@ class Game():
                                 if(yt == 0):
                                     self.raycast_distance = wll.x - e[0]
                                     #print("hit left")
-                                    #self.walls.pop(self.wll_index)
+                                    self.walls.pop(wll_index)
                                     return True
 
                     else:
@@ -397,9 +396,9 @@ class Game():
                             #print("distance standard")
                             self.raycast_distance = sqrt(((wll.x - e[0])**2) + ((e[1] - wll.y)**2))
                             #print("hit")
-                            #self.walls.pop(self.wll_index)
+                            #self.walls.pop(wll_index)
                             return True
-        self.wll_index+=1
+        #wll_index+=1
         return False
 
 Game()
